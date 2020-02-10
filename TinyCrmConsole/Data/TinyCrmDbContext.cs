@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 using Microsoft.EntityFrameworkCore;
 
 namespace TinyCrm.Core.Data
@@ -14,12 +9,12 @@ namespace TinyCrm.Core.Data
 
         public TinyCrmDbContext()
         {
-            connectionString_ = "Server = DESKTOP-TJ30A6D\\BASI17; Database = ecommerce; Integrated Security=SSPI  ; Persist Security Info=False;";
+            connectionString_ = "Server = DESKTOP-TJ30A6D\\BASI17; Database = tinycrm2 ; Integrated Security=SSPI  ; Persist Security Info=False;";
         }
 
         public TinyCrmDbContext(string connString)
         {
-            connectionString_ = connString; 
+            connectionString_ = connString;
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -29,7 +24,12 @@ namespace TinyCrm.Core.Data
             modelBuilder
                 .Entity<Model.Customer>()
                 .ToTable("Customer", "core");
+        
+            modelBuilder
+                 .Entity<Model.Product>()
+                .ToTable("Product", "core");
         }
+
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
@@ -37,5 +37,9 @@ namespace TinyCrm.Core.Data
 
             optionsBuilder.UseSqlServer(connectionString_);
         }
+
+
+
+
     }
 }

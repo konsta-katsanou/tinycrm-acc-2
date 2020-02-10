@@ -38,5 +38,38 @@
 
         ///
         public int Age { get; set; }
+
+
+
+
+        public bool EmailIsValid(string email)
+        {
+
+            return email.Contains("@") ? true : false;
+
+        }
+
+
+        public bool VatNumberIsValid(string vatnumber)
+        {
+            foreach (char x in vatnumber)
+
+                if (char.IsLetter(x))
+                {
+                    return false;
+                }
+
+
+            if (vatnumber.Length != 9)
+            {
+                return false;
+            }
+
+            return true;
+        }
     }
 }
+     
+
+
+        
