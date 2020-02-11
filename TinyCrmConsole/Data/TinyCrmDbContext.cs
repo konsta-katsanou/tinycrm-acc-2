@@ -24,7 +24,20 @@ namespace TinyCrm.Core.Data
             modelBuilder
                 .Entity<Model.Customer>()
                 .ToTable("Customer", "core");
-        
+
+            modelBuilder
+               .Entity<Model.Customer>()
+               .HasIndex(c => c.VatNumber)
+               .IsUnique();
+
+            modelBuilder
+               .Entity<Model.Customer>()
+               .Property(c => c.VatNumber)
+               .HasMaxLength(9)
+               .IsFixedLength();
+               
+
+
             modelBuilder
                  .Entity<Model.Product>()
                 .ToTable("Product", "core");

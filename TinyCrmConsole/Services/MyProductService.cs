@@ -31,7 +31,7 @@ namespace TinyCrmConsole.Services
 
             if (string.IsNullOrWhiteSpace(options.Id) &&
                                     string.IsNullOrWhiteSpace(options.Name) &&
-                                            options.Price == 0 &&
+                                            options.Price < 0 &&
                                             options.Category == 0)
             {
                 return null;

@@ -64,6 +64,8 @@ namespace TinyCrmConsole.Services
 
                 customer.Phone = options.Phone;
             
+            dbContext.Set<Customer>().Add(customer);
+            dbContext.SaveChanges();
             return customer;
 
         }
