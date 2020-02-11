@@ -4,7 +4,7 @@ using System.Text;
 
 namespace TinyCrmConsole.Model.Options
 {
-    public class CreatingProductOptions
+    public class CreatingCustomerOptions
     {
 
         public string Phone { get; set; }

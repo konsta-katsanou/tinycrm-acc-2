@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using Microsoft.Extensions.Options;
 using TinyCrm.Core.Data;
 using TinyCrm.Core.Model;
 using TinyCrm.Core.Services;
@@ -12,54 +13,44 @@ namespace TinyCrmConsole
     class Program
     {
         static void Main(string[] args)
-        {
-            using (TinyCrmDbContext context = new TinyCrmDbContext())
+
+        { //inserting the data into the dataset
+
+            using (var context = new TinyCrmDbContext())
             {
 
-                var customer = new Customer();
-                customer.VatNumber = "123456789";
-                customer.Age = 25;
-                customer.Email = "kon.katsan@gmail.com";
-                customer.Firstname = "Konstantina";
 
-                var customer1 = new Customer();
-                customer.VatNumber = "147523698";
-                customer.Age = 15;
-                customer.Email = "koukourikou@gmail.com";
-                customer.Firstname = "bladimiros";
+                var customer = new Customer()
+                {
+                    Lastname = "Katsanou",
+                    Email = "koukourikou@gmail.com",
+                    Firstname = "Paraskevi",
+                    Age = 25
 
-
-
+                };
                 context.Add(customer);
-                context.Add(customer1);
-
                 context.SaveChanges();
 
-                var customers = context.Set<Customer>().ToList();
-
-
-
-
-                ICustomerService customerservice = new CustomerService();
+                ICustomerService customerservice = new CustomerService(context);
 
                 var options = new SearchingCustomeroptions()
                 {
-                    FirstName = "stan",
-
-                    Email = "kon.katsan@gmail.com"
+                    Email = "koukourikou@gmail.com",
+                    FirstName = "Paraskevi"
                 };
 
-                var results = customerservice.SearchCustomers(customers, options);
+                var results = customerservice.SearchCustomers(options);
+
+
 
                 Console.WriteLine($"Found {results.Count()} customers");
 
-
-                var createoptions = new CreatingProductOptions()
-
+                var createoptions = new CreatingCustomerOptions()
                 {
-                    Firstname = "Paraskevi",
-                    Email = "papadopoulou@gmail.com",
-                    VatNumber = "124256378"
+                    VatNumber = "125648934",
+                    Email = "constance@gmail.com",
+                    Age = 32,
+                    Lastname = "Papadimitriou"
                 };
 
                 var result = customerservice.CreateCustomer(createoptions);
@@ -67,7 +58,7 @@ namespace TinyCrmConsole
                 context.Set<Customer>().Add(result);
                 context.SaveChanges();
 
-                Customer customerbyid = customerservice.GetCustomerById(customers, 1);
+                Customer customerbyid = customerservice.GetCustomerById(1);
 
                 Console.WriteLine($"The name of the customer with id {customerbyid.Id} is {customerbyid.Firstname}");
 
@@ -76,58 +67,57 @@ namespace TinyCrmConsole
                 //ProductService Implementation
 
 
-                IProductService productservice = new MyProductService();
+                //    IProductService productservice = new MyProductService(context);
 
-                var pro_options = new CreatingProduct()
-                {
-                    Id = "ased452",
-                    Description = "good camera analysis",
-                    Price = 160,
-                    Name = "Samsung A7",
-                    Category = ProductCategory.Smartphones
-
-
-                };
-
-                var product1 = productservice.CreateProduct(pro_options);
-
-                context.Set<Product>().Add(product1);
-
-                var pro_options1 = new CreatingProduct()
-                {
-                    Id ="ert1234",
-
-                    Price = 250,
-                    Name = "Toshiba",
-                    Category = ProductCategory.Televisions
+                //    var pro_options = new CreatingProduct()
+                //    {
+                //        Id = "5963",
+                //        Description = "good camera analysis",
+                //        Price = 160,
+                //        Name = "Samsung A7",
+                //        Category = ProductCategory.Laptops
 
 
-                };
-                var product2 = productservice.CreateProduct(pro_options1);
+                //    };
 
-                context.Set<Product>().Add(product2);
+                //    var product1 = productservice.CreateProduct(pro_options);
 
-                context.SaveChanges();
+                //    context.Set<Product>().Add(product1);
 
-                var products = context.Set<Product>().ToList();
 
-                var searchoptions = new ProductSearchingOptions()
-                {
-                    MaxPrice = 500,
-                    MinPrice = 100
-                };
+                //    context.SaveChanges();
 
-                products = productservice.SearchProducts(products, searchoptions);
-                foreach (var product in products)
-                {
-                    Console.WriteLine($"The products have ids {product.Id}");
-                }
+
+
+                //    var searchoptions = new ProductSearchingOptions()
+                //    {
+                //        Name = "Samsung A7"
+                //    };
+
+                //    var products = productservice.SearchProducts( searchoptions);
+
+                //    foreach (var product in products)
+                //    {
+                //        Console.WriteLine($"The products have ids {product.Id}");
+                //    }
+                //}
+
+                IProductService productservice = new MyProductService(context);
+
+                context.AddRange(new Product { Name = "pc", InStock = 5, Id = "123" }, new Product
+                { Name = "laptop", InStock = 10, Id = "116" });
+
+                var total = productservice.TotalStock();
+
+
+
+                Console.Write(total);
+
+
+                Console.ReadKey();
             }
-
-            Console.Write("Ok");
-
-            Console.ReadKey();
         }
+        
     }
 }
 

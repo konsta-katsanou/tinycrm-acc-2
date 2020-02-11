@@ -22,6 +22,8 @@ namespace TinyCrmConsole.Model.Options
        
         public string Description { get; set; }
 
+        
+
 
     }
 }
