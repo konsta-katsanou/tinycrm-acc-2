@@ -15,6 +15,7 @@ namespace TinyCrmConsole.Services
 
     {
         private TinyCrmDbContext dbContext;
+        private readonly object customerservice;
 
         public CustomerService(TinyCrmDbContext context)
         {
@@ -23,9 +24,9 @@ namespace TinyCrmConsole.Services
 
 
 
-        public Customer CreateCustomer( CreatingCustomerOptions options)
+        public Customer CreateCustomer(CreatingCustomerOptions options)
         {
-            
+
 
             if (options == null) //opote perimeono parametro pou mporei na parei default timi tote prepei na elegxo an einai null
             {
@@ -41,7 +42,7 @@ namespace TinyCrmConsole.Services
             }
 
             var customer = new Customer();
-            
+
             if (!customer.EmailIsValid(options.Email))
             {
                 return null;
@@ -51,26 +52,26 @@ namespace TinyCrmConsole.Services
             {
                 return null;
             }
-            
-                customer.Email = options.Email;
 
-                customer.VatNumber = options.VatNumber;
+            customer.Email = options.Email;
 
-                customer.Age = options.Age;
+            customer.VatNumber = options.VatNumber;
 
-                customer.Firstname = options.Firstname;
+            customer.Age = options.Age;
 
-                customer.Lastname = options.Lastname;
+            customer.Firstname = options.Firstname;
 
-                customer.Phone = options.Phone;
-            
+            customer.Lastname = options.Lastname;
+
+            customer.Phone = options.Phone;
+
             dbContext.Set<Customer>().Add(customer);
             dbContext.SaveChanges();
             return customer;
 
         }
-        
-        public List<Customer> SearchCustomers( SearchingCustomeroptions options)
+
+        public List<Customer> SearchCustomers(SearchingCustomeroptions options)
         {
             if (options == null)
             {
@@ -112,7 +113,7 @@ namespace TinyCrmConsole.Services
         }
 
 
-        public Customer GetCustomerById( int customerid )
+        public Customer GetCustomerById(int customerid)
         {
             var options = new SearchingCustomeroptions()
             {
@@ -122,7 +123,22 @@ namespace TinyCrmConsole.Services
             var customer = SearchCustomers(options).SingleOrDefault();
 
 
-            return customer ;
+            return customer;
+
+        }
+
+
+        public Customer GetCustomerByVatNumber(string vatNumber)
+        {
+            var options = new SearchingCustomeroptions()
+            {
+                VatNumber = vatNumber
+            };
+
+            var customer = SearchCustomers(options).SingleOrDefault();
+
+            return customer;
+            
 
         }
 

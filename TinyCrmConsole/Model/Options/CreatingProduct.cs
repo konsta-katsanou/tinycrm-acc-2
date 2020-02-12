@@ -7,7 +7,7 @@ namespace TinyCrmConsole.Model.Options
 {
     public class CreatingProduct
     {
-        public string Id { get; set; }
+        
 
         public string Name { get; set; }
 
@@ -21,6 +21,8 @@ namespace TinyCrmConsole.Model.Options
 
        
         public string Description { get; set; }
+
+        public int InStock { get; set; }
 
         
 

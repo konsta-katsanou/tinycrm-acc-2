@@ -9,11 +9,13 @@ namespace TinyCrmConsole.Interfaces
 {
     public interface ICustomerService
     {
-        List<Customer> SearchCustomers (SearchingCustomeroptions options);
+        List<Customer> SearchCustomers(SearchingCustomeroptions options);
 
-        Customer CreateCustomer( CreatingCustomerOptions options);
+        Customer CreateCustomer(CreatingCustomerOptions options);
 
-        Customer GetCustomerById( int customerid);
+        Customer GetCustomerById(int customerid);
+
+        Customer GetCustomerByVatNumber(string customerVatNumber);
 
     }
 }

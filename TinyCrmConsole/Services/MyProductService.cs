@@ -29,43 +29,45 @@ namespace TinyCrmConsole.Services
 
             var product = new Product();
 
-            if (string.IsNullOrWhiteSpace(options.Id) &&
-                                    string.IsNullOrWhiteSpace(options.Name) &&
-                                            options.Price < 0 &&
-                                            options.Category == 0)
+            if (string.IsNullOrWhiteSpace(options.Name))
+            {
+                return null;
+            }
+
+            if (options.Price <= 0)
+            {
+                return null;
+            }
+
+            if (options.Category == ProductCategory.Invalid)
             {
                 return null;
             }
 
             product.Category = options.Category;
-            product.Id = options.Id;
+            
             product.Name = options.Name;
             product.Price = options.Price;
             product.Description = options.Description;
             product.Discount = options.Discount;
 
+
+            dbContext.Set<Product>().Add(product);
+            dbContext.SaveChanges();
+
             return product;
         }
 
-        public List<Product> SearchProducts( ProductSearchingOptions options)
+        public List<Product> SearchProducts(ProductSearchingOptions options)
         {
-           
-
+            
             if (options == null)
             {
                 return null;
             }
 
-             var query = dbContext.Set<Product>().AsQueryable();
-
-            if (!string.IsNullOrWhiteSpace(options.Id))
-            {
-
-                query = query.Where(p => p.Id.Equals(options.Id,
-                                                    StringComparison.OrdinalIgnoreCase));
-
-            }
-
+            var query = dbContext.Set<Product>().AsQueryable();
+                    
             if (!string.IsNullOrWhiteSpace(options.Name))
             {
                 query = query.Where(p => p.Name.Contains(options.Name,
@@ -75,16 +77,18 @@ namespace TinyCrmConsole.Services
             if (options.MinPrice != 0)
             {
                 query = query.Where(p =>
-                                        p.Price >= options.MinPrice)
-                                       ;
+                                        p.Price >= options.MinPrice);
             }
 
             if (options.MaxPrice >= 0)
             {
                 query = query.Where(p =>
-                                        p.Price <= options.MaxPrice)
-                                       ;
+                                        p.Price <= options.MaxPrice);
+                                       
             }
+
+            query = query.Where(p =>p.Category == options.Category);
+
 
             return query.ToList();
 
@@ -94,8 +98,8 @@ namespace TinyCrmConsole.Services
         public int TotalStock()
         {
             var query = dbContext.Set<Product>().AsQueryable();
-                        
-            var totalStock = query.Sum(c => c.InStock );
+
+            var totalStock = query.Sum(c => c.InStock);
 
             return totalStock;
 

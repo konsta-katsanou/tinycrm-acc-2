@@ -6,6 +6,7 @@ using TinyCrmConsole.Interfaces;
 using TinyCrmConsole.Model.Options;
 using TinyCrm.Core.Services;
 using TinyCrm.Core.Model;
+using System;
 
 namespace TinyCrmTests
 {
@@ -18,16 +19,18 @@ namespace TinyCrmTests
         {
             context_ = new TinyCrmDbContext();
         }
-        
+
+
+
         [Fact]
         public void AddProduct_Success()
         {
             IProductService productservice =
-                    new MyProductService(context_);
+                 new MyProductService(context_);
 
             var options = new CreatingProduct()
             {
-                Id = "125asd",
+                Name = "pc",
                 Description = "pc's adaptor",
                 Price = 25,
                 Category = ProductCategory.Computers
@@ -36,23 +39,26 @@ namespace TinyCrmTests
             var product = productservice.CreateProduct(options);
 
             Assert.NotNull(product);
-            Assert.Equal(options.Id, product.Id);
+
+
             Assert.Equal(options.Name, product.Name);
             Assert.Equal(options.Price, product.Price);
             Assert.Equal(options.Category, product.Category);
-            
+
+            Assert.NotEqual(default(Guid), product.Id);
+
+
         }
 
         [Fact]
         public void AddProduct_Fail_Null_Validation()
         {
             IProductService productservice =
-                    new MyProductService(context_);
+                  new MyProductService(context_);
+
 
             var options = new CreatingProduct()
-            {
-                
-            };
+            { };
 
             var product = productservice.CreateProduct(options);
 
@@ -61,94 +67,84 @@ namespace TinyCrmTests
         }
 
         [Fact]
-        public void AddProduct_IdInvalid_Inputs()
+        public void AddProduct_InValid_Name()
         {
             IProductService productservice =
-                    new MyProductService(context_);
-            //invalid Id
+                  new MyProductService(context_);
+
+
             var options = new CreatingProduct()
             {
-                Id = "....",
-                Name = "pc's adaptor",
-                Price = 25,
-                Category = ProductCategory.Computers
+
+                Name = null,
+                Price = 45,
+                Category = ProductCategory.Smartphones,
+                InStock = 10
+
             };
 
             var product = productservice.CreateProduct(options);
 
-            Assert.NotNull(product);
+            Assert.Null(product);
 
             options = new CreatingProduct()
             {
-                Id = null ,
-               Name = "pc's adaptor",
-                Price = 25,
-                Category = ProductCategory.Computers
+
+                Name = "   ",
+                Price = 45,
+                Category = ProductCategory.Smartphones,
+                InStock = 10
+
             };
 
             product = productservice.CreateProduct(options);
 
-            Assert.NotNull(product);
+            Assert.Null(product);
 
-            //invalid Name
-            options = new CreatingProduct()
+        }
+
+        [Fact]
+        public void AddProduct_InValid_Price()
+        {
+            IProductService productservice =
+                  new MyProductService(context_);
+
+            var options = new CreatingProduct()
             {
-                Id = "123456",
-                Name = "...",
-                Price = 25,
-                Category = ProductCategory.Computers
-            };
 
-            product = productservice.CreateProduct(options);
-
-            Assert.NotNull(product);
-
-            options = new CreatingProduct()
-            {
-                Id = "123456 ",
-                Name = null,
-                Price = 25,
-                Category = ProductCategory.Computers
-            };
-
-            product = productservice.CreateProduct(options);
-
-            Assert.NotNull(product);
-
-            //invalid Price
-
-            options = new CreatingProduct()
-            {
-                Id = "123456 ",
                 Name = "Laptop",
                 Price = -2,
                 Category = ProductCategory.Computers
             };
 
-            product = productservice.CreateProduct(options);
+            var product = productservice.CreateProduct(options);
 
-            Assert.NotNull(product);
+            Assert.Null(product);
+        }
 
 
-            //invalid category
 
-            options = new CreatingProduct()
+        [Fact]
+        public void AddProduct_InValid_Caterory()
+        {
+            IProductService productservice =
+                  new MyProductService(context_);
+
+
+            var options = new CreatingProduct()
             {
-                Id = "123456 ",
+
                 Name = "Laptop",
                 Price = 25,
                 Category = ProductCategory.Invalid
             };
 
-            product = productservice.CreateProduct(options);
+            var product = productservice.CreateProduct(options);
 
-            Assert.NotNull(product);
+            Assert.Null(product);
 
 
         }
-
-       
-
 
 
 

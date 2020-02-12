@@ -1,11 +1,8 @@
-using System;
 using Xunit;
 using TinyCrm.Core.Data;
-using TinyCrm.Core.Model.Options;
 using TinyCrmConsole.Services;
 using TinyCrmConsole.Interfaces;
 using TinyCrmConsole.Model.Options;
-using TinyCrm.Core.Model;
 
 namespace TinyCrmTests
 {
@@ -45,15 +42,18 @@ namespace TinyCrmTests
             Assert.Equal(options.Firstname, customer.Firstname);
 
             //elegxoume kai thn apothikeusi sthn basi
-            var testidcustomer = customerservice.GetCustomerById(customer.Id); //mporei kapoios na eixe ksexasei na kanei SaveChanges 
+
+
+            var testidcustomer = customerservice.GetCustomerById(customer.Id); 
+            
+            
+            //mporei kapoios na eixe ksexasei na kanei SaveChanges 
             //opote etsi mporoume na elegksoume oti ginetai save
             //tautoxrona mporoyme na elegksoume kai tin nea synartisi getcustomerby id
 
 
             Assert.NotNull(testidcustomer);
-
             
-
 
         }
 
@@ -72,10 +72,29 @@ namespace TinyCrmTests
 
             Assert.Null(customer);// elegxo an den mporei na ginei eisagogi neou pelati
 
+
+            options = new CreatingCustomerOptions()
+            {
+                VatNumber = "....."
+            };
+
+            customer = customerservice.CreateCustomer(options);
+
+            Assert.Null(customer);
+
+            options = new CreatingCustomerOptions()
+            {
+                VatNumber = "11hnvwksd25"
+            };
+
+            customer = customerservice.CreateCustomer(options);
+
+            Assert.Null(customer);
+
         }
 
         [Fact]
-        public void CreateCustomer_Email_Null_Validation()
+        public void CreateCustomer_Email_Fail_Validation()
         {
             ICustomerService customerservice =
                         new CustomerService(context_);
@@ -116,5 +135,29 @@ namespace TinyCrmTests
             Assert.Null(customer);
 
         }
-    }
+
+
+
+
+        [Fact]
+        public void Unique_VatNumber_Success()
+        {
+            ICustomerService customerservice =
+                       new CustomerService(context_);
+
+            var options = new CreatingCustomerOptions()
+            {
+                Email = "kk@gmail.com",
+                Firstname = "Konstantina",
+                VatNumber = "123456879"
+            };
+
+            var customer = customerservice.CreateCustomer(options);
+
+           var testCustomer = customerservice.GetCustomerByVatNumber(options.VatNumber);
+
+            Assert.NotNull(testCustomer);
+            
+        }
+   }
 }

@@ -35,12 +35,14 @@ namespace TinyCrm.Core.Data
                .Property(c => c.VatNumber)
                .HasMaxLength(9)
                .IsFixedLength();
-               
+
+
 
 
             modelBuilder
                  .Entity<Model.Product>()
                 .ToTable("Product", "core");
+
         }
 
 
