@@ -1,104 +1,91 @@
 using Xunit;
 using TinyCrm.Core.Data;
-using TinyCrmConsole.Services;
 using TinyCrmConsole.Interfaces;
 using TinyCrmConsole.Model.Options;
+using System;
 
 namespace TinyCrmTests
 {
-    public class CustomerServiceTests
+    public class CustomerServiceTests :
+                                  IClassFixture<TinyCrmFixture>
     {
         private TinyCrmDbContext context_;
+        private ICustomerService customers;
 
-        
-        public CustomerServiceTests()
+        public CustomerServiceTests(TinyCrmFixture fixture)
         {
-            context_ = new TinyCrmDbContext();
+            context_ = fixture.Context;
+            customers = fixture.Customer;
         }
 
 
         [Fact]
         public void CreateCustomer_Success()
         {
-            ICustomerService customerservice =
-                    new CustomerService(context_);
-
             var options = new CreatingCustomerOptions()
             { 
-                
-                Email = "ddw@gmail.com",
+                Email = "ddip@gmail.com",
                 Firstname = "Dimitris",
-                VatNumber = "123456889"
+                VatNumber = $"11{DateTime.Now:fffffff}"
             };
 
-            var customer = customerservice.CreateCustomer(options);
+            var customer = customers.CreateCustomer(options);
 
             Assert.NotNull(customer);
 
-            Assert.Equal(options.Email, customer.Email);
+            Assert.NotNull(customer.Data);
 
-            Assert.Equal(options.VatNumber, customer.VatNumber);
+            Assert.Equal(options.Email, customer.Data.Email);
 
-            Assert.Equal(options.Firstname, customer.Firstname);
+            Assert.Equal(options.VatNumber, customer.Data.VatNumber);
 
-            //elegxoume kai thn apothikeusi sthn basi
-
-
-            var testidcustomer = customerservice.GetCustomerById(customer.Id); 
+            Assert.Equal(options.Firstname, customer.Data.Firstname);
+          
+            //checking the savechanges command
             
+            var testidcustomer = customers.GetCustomerById(customer.Data.Id);
             
-            //mporei kapoios na eixe ksexasei na kanei SaveChanges 
-            //opote etsi mporoume na elegksoume oti ginetai save
-            //tautoxrona mporoyme na elegksoume kai tin nea synartisi getcustomerby id
-
-
             Assert.NotNull(testidcustomer);
-            
 
+            Assert.NotNull(testidcustomer.Data);
+            
         }
 
         [Fact]
         public void CreateCustomer_Fail_Null_Validation()
         {
-            ICustomerService customerservice =
-                        new CustomerService(context_);
-
             var options = new CreatingCustomerOptions()
             {
                 VatNumber = null
             };
 
-            var customer = customerservice.CreateCustomer(options);
+            var customer = customers.CreateCustomer(options);
 
-            Assert.Null(customer);// elegxo an den mporei na ginei eisagogi neou pelati
-
-
+            Assert.Null(customer.Data);
+            
             options = new CreatingCustomerOptions()
             {
                 VatNumber = "....."
             };
 
-            customer = customerservice.CreateCustomer(options);
+            customer = customers.CreateCustomer(options);
 
-            Assert.Null(customer);
+            Assert.Null(customer.Data);
 
             options = new CreatingCustomerOptions()
             {
                 VatNumber = "11hnvwksd25"
             };
 
-            customer = customerservice.CreateCustomer(options);
+            customer = customers.CreateCustomer(options);
 
-            Assert.Null(customer);
+            Assert.Null(customer.Data);
 
         }
 
         [Fact]
         public void CreateCustomer_Email_Fail_Validation()
         {
-            ICustomerService customerservice =
-                        new CustomerService(context_);
-
             var options = new CreatingCustomerOptions()
             {
                 Email = null,
@@ -106,9 +93,9 @@ namespace TinyCrmTests
                 VatNumber = "123456789"
             };
 
-            var customer = customerservice.CreateCustomer(options);
+            var customer = customers.CreateCustomer(options);
 
-            Assert.Null(customer);
+            Assert.Null(customer.Data);
             
              options = new CreatingCustomerOptions()
             {
@@ -117,12 +104,10 @@ namespace TinyCrmTests
                 VatNumber = "123456789"
             };
 
-            customer = customerservice.CreateCustomer(options);
+            customer = customers.CreateCustomer(options);
 
-            Assert.Null(customer);
-
-       
-
+            Assert.Null(customer.Data);
+            
             options = new CreatingCustomerOptions()
             {
                 Email = "......",
@@ -130,34 +115,40 @@ namespace TinyCrmTests
                 VatNumber = "123456789"
             };
 
-            customer = customerservice.CreateCustomer(options);
+            customer = customers.CreateCustomer(options);
 
-            Assert.Null(customer);
+            Assert.Null(customer.Data);
 
         }
-
-
-
+        
 
         [Fact]
         public void Unique_VatNumber_Success()
         {
-            ICustomerService customerservice =
-                       new CustomerService(context_);
-
+            
             var options = new CreatingCustomerOptions()
             {
                 Email = "kk@gmail.com",
                 Firstname = "Konstantina",
-                VatNumber = "123456879"
+                VatNumber = $"11{ DateTime.Now:fffffff}"
             };
 
-            var customer = customerservice.CreateCustomer(options);
+          var customer = customers.CreateCustomer(options);
 
-           var testCustomer = customerservice.GetCustomerByVatNumber(options.VatNumber);
+          var testCustomer = customers.GetCustomerByVatNumber(options.VatNumber);
 
             Assert.NotNull(testCustomer);
-            
+            Assert.NotNull(testCustomer.Data);
+
+            var options1 = new CreatingCustomerOptions()
+            {
+                VatNumber = options.VatNumber
+            };
+
+            var testcustomer = customers.CreateCustomer(options1);
+
+            Assert.Null(testcustomer.Data);
+
         }
    }
 }
