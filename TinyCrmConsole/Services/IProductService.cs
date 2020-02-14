@@ -2,6 +2,7 @@
 using TinyCrm.Core.Model;
 using System.Collections.Generic;
 using TinyCrmConsole.Model.Options;
+using TinyCrmConsole.Model;
 
 namespace TinyCrm.Core.Services
 {
@@ -10,9 +11,9 @@ namespace TinyCrm.Core.Services
     /// </summary>
     public interface IProductService
     {
-        List<Product> SearchProducts(ProductSearchingOptions options);
+        ApiResult<List<Product>> SearchProducts(ProductSearchingOptions options);
 
-        Product CreateProduct(CreatingProduct options);
+        ApiResult<Product> CreateProduct(CreatingProductOptions options);
 
         int TotalStock();
 

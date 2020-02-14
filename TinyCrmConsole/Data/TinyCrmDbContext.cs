@@ -1,5 +1,6 @@
 ﻿
 using Microsoft.EntityFrameworkCore;
+using TinyCrmConsole.Model;
 
 namespace TinyCrm.Core.Data
 {
@@ -36,13 +37,21 @@ namespace TinyCrm.Core.Data
                .HasMaxLength(9)
                .IsFixedLength();
 
-
+            modelBuilder
+                .Entity<Model.Order>()
+               .ToTable("Order", "core");
 
 
             modelBuilder
                  .Entity<Model.Product>()
                 .ToTable("Product", "core");
 
+            modelBuilder
+                    .Entity<Model.OrderProduct>()
+                    .ToTable("OrderProduct", "core");
+            modelBuilder
+                .Entity<Model.OrderProduct>()
+                .HasKey(op => new { op.ProductId, op.OrderId });
         }
 
 

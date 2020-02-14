@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace TinyCrmConsole.Model.Options
+﻿namespace TinyCrmConsole.Model.Options
 {
     public class SearchingCustomeroptions
     {
@@ -15,7 +11,5 @@ namespace TinyCrmConsole.Model.Options
         public string FirstName {get; set;}
 
         public string LastName { get; set; }
-
-
     }
 }

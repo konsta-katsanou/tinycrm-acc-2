@@ -7,8 +7,8 @@ namespace TinyCrmConsole.Model.Options
 {
     public class ProductSearchingOptions
     {
-       
-        
+        public Guid Id { get; set; }
+
         public string Name { get; set; }
         
         public decimal MinPrice { get; set; }
@@ -16,6 +16,5 @@ namespace TinyCrmConsole.Model.Options
         public decimal MaxPrice { get; set; }
 
         public ProductCategory Category { get; set; }
-
     }
 }

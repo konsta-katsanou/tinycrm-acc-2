@@ -1,52 +1,36 @@
-﻿namespace TinyCrm.Core.Model
+﻿using System.Collections.Generic;
+
+namespace TinyCrm.Core.Model
+
 {
-    /// <summary>
-    /// 
-    /// </summary>
     public class Customer
     {
-        /// <summary>
-        /// 
-        /// </summary>
         public int Id { get; set; }
 
-        /// <summary>
-        /// 
-        /// </summary>
         public string Phone { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
+        
         public string Email { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
+        
         public string Lastname { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
+        
         public string VatNumber { get; set; }
-
-        /// <summary>
-        /// 
-        /// </summary>
+        
         public string Firstname { get; set; }
-        ///
 
-        ///
         public int Age { get; set; }
 
+        public List<Order> Orders { get; set; }
 
+
+        public Customer()
+        {
+            Orders = new List<Order>();
+        }
 
 
         public bool EmailIsValid(string email)
         {
-
             return email.Contains("@") ? true : false;
-
         }
 
 
@@ -58,8 +42,7 @@
                 {
                     return false;
                 }
-
-
+            
             if (vatnumber.Length != 9)
             {
                 return false;
@@ -69,7 +52,6 @@
         }
     }
 }
-     
 
 
-        
+
