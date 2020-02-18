@@ -8,26 +8,24 @@ using TinyCrm.Core.Services;
 using TinyCrm.Core.Model;
 using System;
 using TinyCrmConsole.Model;
+using TinyCrmApi.Model;
 
 namespace TinyCrmTests
 {
     public class ProductServiceTests:
                             IClassFixture<TinyCrmFixture>
-        
-
     {
         private TinyCrmDbContext context_;
-
         private IProductService products;
 
         public ProductServiceTests(TinyCrmFixture fixture) 
         {
             context_ = fixture.Context;
-            products = fixture.Product;
+            products = fixture.Products;
         }
 
         [Fact]
-        public void AddProduct_Success()
+        public Product AddProduct_Success()
         {
             var options = new CreatingProductOptions()
             {
@@ -37,7 +35,7 @@ namespace TinyCrmTests
                 Category = ProductCategory.Computers
             };
 
-            var result = products.CreateProduct(options);
+            var result = products.AddProduct(options);
 
             Assert.NotNull(result);
             Assert.NotNull(result.Data);
@@ -46,6 +44,7 @@ namespace TinyCrmTests
             Assert.Equal(options.Category, result.Data.Category);
 
             Assert.NotEqual(default(Guid), result.Data.Id);
+            return result.Data;
         }
 
         [Fact]
@@ -54,10 +53,10 @@ namespace TinyCrmTests
             
             var options = new CreatingProductOptions() { };
 
-            var product = products.CreateProduct(options);
+            var product = products.AddProduct(options);
             
             Assert.Null(product.Data);
-            Assert.Equal(StatusCode.BadRequest, product.Error);
+            Assert.Equal(StatusCode.BadRequest, product.ErrorCode);
 
         }
 
@@ -72,10 +71,10 @@ namespace TinyCrmTests
                 InStock = 10
             };
 
-            var product = products.CreateProduct(options);
+            var product = products.AddProduct(options);
 
             Assert.Null(product.Data);
-            Assert.Equal(StatusCode.BadRequest, product.Error);
+            Assert.Equal(StatusCode.BadRequest, product.ErrorCode);
 
             options = new CreatingProductOptions()
             {
@@ -85,10 +84,10 @@ namespace TinyCrmTests
                 InStock = 10
             };
 
-            product = products.CreateProduct(options);
+            product = products.AddProduct(options);
 
             Assert.Null(product.Data);
-            Assert.Equal(StatusCode.BadRequest, product.Error);
+            Assert.Equal(StatusCode.BadRequest, product.ErrorCode);
         }
 
         [Fact]
@@ -101,10 +100,10 @@ namespace TinyCrmTests
                 Category = ProductCategory.Computers
             };
 
-            var product = products.CreateProduct(options);
+            var product = products.AddProduct(options);
 
             Assert.Null(product.Data);
-            Assert.Equal(StatusCode.BadRequest, product.Error);
+            Assert.Equal(StatusCode.BadRequest, product.ErrorCode);
         }
         
         [Fact]
@@ -116,10 +115,10 @@ namespace TinyCrmTests
                 Price = 25,
                 Category = ProductCategory.Invalid
             };
-            var product = products.CreateProduct(options);
+            var product = products.AddProduct(options);
 
             Assert.Null(product.Data);
-            Assert.Equal(StatusCode.BadRequest, product.Error);
+            Assert.Equal(StatusCode.BadRequest, product.ErrorCode);
             
         }
     }

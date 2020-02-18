@@ -16,7 +16,7 @@ namespace TinyCrmConsole.Model.Options
         //optional properties
 
         public decimal Discount { get; set; }
-        
+
         public string Description { get; set; }
 
         public int InStock { get; set; }

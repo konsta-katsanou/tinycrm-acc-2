@@ -5,7 +5,7 @@ using System.Text;
 namespace TinyCrm.Core.Model
 {
     public enum OrderStatus
-    { 
+    {
         InValid = 0,
 
         Delivered = 1,

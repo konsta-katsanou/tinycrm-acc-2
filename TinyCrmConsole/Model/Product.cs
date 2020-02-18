@@ -17,5 +17,12 @@ namespace TinyCrm.Core.Model
         public ProductCategory Category { get; set; }
         
         public int InStock { get; set; }
+
+        public int TotalNumberSold { get; set; }
+
+        public Product()
+        {
+            TotalNumberSold = 0;
+        }
     }
 }

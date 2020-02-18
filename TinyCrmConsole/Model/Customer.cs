@@ -18,6 +18,8 @@ namespace TinyCrm.Core.Model
         public string Firstname { get; set; }
 
         public int Age { get; set; }
+        
+        public decimal TotalGross { get; set; }
 
         public List<Order> Orders { get; set; }
 
@@ -25,8 +27,9 @@ namespace TinyCrm.Core.Model
         public Customer()
         {
             Orders = new List<Order>();
+            TotalGross = 0;
         }
-
+        
 
         public bool EmailIsValid(string email)
         {

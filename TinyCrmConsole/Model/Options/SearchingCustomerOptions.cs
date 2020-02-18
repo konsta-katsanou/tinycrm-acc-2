@@ -1,6 +1,6 @@
 ﻿namespace TinyCrmConsole.Model.Options
 {
-    public class SearchingCustomeroptions
+    public class SearchingCustomerOptions
     {
         public int Id { get; set; }
 
