@@ -61,9 +61,6 @@ namespace TinyCrm.Core.Data
 
             optionsBuilder.UseSqlServer(connectionString_);
         }
-
-
-
-
+        
     }
 }

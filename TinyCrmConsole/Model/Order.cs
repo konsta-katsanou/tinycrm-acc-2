@@ -14,18 +14,22 @@ namespace TinyCrm.Core.Model
 
         public OrderStatus Status { get; set; }
 
+        public decimal OrderCost { get; set; }
+
         //navigation properties for customer
-        public int CustomerId { get; set;}
+        public int CustomerId { get; set; }
 
         public Customer Customer { get; set; }
-
-
+        
         public List<OrderProduct> OrderProducts { get; set; }
 
         public Order()
         {
             OrderProducts = new List<OrderProduct>();
+            OrderCost = 0;
         }
-
+        
+        
+        
     }
 }

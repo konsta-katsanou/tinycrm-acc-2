@@ -1,14 +1,14 @@
-﻿namespace TinyCrmConsole.Model
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+namespace TinyCrmApi.Model
 {
     public enum StatusCode
     {
+        Success = 200,
+        NotFound = 404,
         BadRequest = 403,
-
-        InterServError = 500,
-
-        NotFound =404,
-        
-        Success =200
-         
+        InternalServerError = 500
     }
 }

@@ -1,6 +1,6 @@
 ﻿namespace TinyCrm.Core.Model
 {
-   
+
     public enum ProductCategory
     {
         Invalid = 0,
@@ -10,7 +10,7 @@
         Laptops = 2,
 
         Computers = 3,
-        
+
         Smartphones = 4,
 
         Televisions = 5
