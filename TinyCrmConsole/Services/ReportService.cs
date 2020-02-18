@@ -50,18 +50,18 @@ namespace TinyCrmConsole.Services
             return top10.ToList();
         }
         
-        public ApiResult<IQueryable<Order>> OrderInAPeriod(
+        public ApiResult<decimal> TotalSalesInAPeriod(
            SearchingOrderOptions options)
         {
             if (options == null)
             {
-                return ApiResult<IQueryable<Order>>.CreateUnSuccessful(
+                return ApiResult<decimal>.CreateUnSuccessful(
                      StatusCode.BadRequest,
                      "null options");
             }
             if (options.StartDate == null && options.LastDate == null)
             {
-                return ApiResult<IQueryable<Order>>.CreateUnSuccessful(
+                return ApiResult<decimal>.CreateUnSuccessful(
                     StatusCode.BadRequest,
                     " at least one date must be provided");
             }
@@ -75,8 +75,10 @@ namespace TinyCrmConsole.Services
                 orders = orders.Where(o => o.Created <= options.LastDate);
             }
 
-            return ApiResult<IQueryable<Order>>
-                           .CreateSuccessful(orders);
+            var totalsales = orders.Sum(o => o.OrderCost);
+
+            return ApiResult<decimal>
+                           .CreateSuccessful(totalsales);
         }
 
         public ApiResult<int> NumberOfOrdersInEachState(

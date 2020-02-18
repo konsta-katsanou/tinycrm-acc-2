@@ -58,18 +58,18 @@ namespace TinyCrmTests
         }
 
         [Fact]
-        public void OrderInAPeriod_Success()
+        public void TotalSalesInAPeriod_Success()
         {
             var o1 = orderServiceTest_.CreateOrder_Succees();
             var o2 = orderServiceTest_.CreateOrder_Succees();
-            var o3 = orderServiceTest_.CreateOrder_Succees();
             var options = new SearchingOrderOptions()
             {
                 StartDate = o1.Created,
-                LastDate = o3.Created
+                LastDate = o2.Created
             };
-            var ords = report.OrderInAPeriod(options).Data.Count();
-            Assert.Equal(3, ords);
+            var tcost = o1.OrderCost + o2.OrderCost;
+            var ords = report.TotalSalesInAPeriod(options).Data;
+            Assert.Equal(tcost, ords);
         }
 
         [Fact]

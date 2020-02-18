@@ -15,7 +15,7 @@ namespace TinyCrmConsole.Services
 
         List<Customer> Top10CustomerByGross();
 
-        ApiResult<IQueryable<Order>> OrderInAPeriod(
+        ApiResult<decimal> TotalSalesInAPeriod(
             SearchingOrderOptions option);
                  
 
