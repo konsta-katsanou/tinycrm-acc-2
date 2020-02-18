@@ -3,6 +3,7 @@ using TinyCrm.Core.Data;
 using TinyCrmConsole.Interfaces;
 using TinyCrmConsole.Model.Options;
 using System;
+using TinyCrm.Core.Model;
 
 namespace TinyCrmTests
 {
@@ -15,18 +16,18 @@ namespace TinyCrmTests
         public CustomerServiceTests(TinyCrmFixture fixture)
         {
             context_ = fixture.Context;
-            customers = fixture.Customer;
+            customers = fixture.Customers;
         }
 
 
         [Fact]
-        public void CreateCustomer_Success()
+        public Customer CreateCustomer_Success()
         {
             var options = new CreatingCustomerOptions()
             { 
                 Email = "ddip@gmail.com",
                 Firstname = "Dimitris",
-                VatNumber = $"11{DateTime.Now:fffffff}"
+                VatNumber = $"56{DateTime.Now:fffffff}"
             };
 
             var customer = customers.CreateCustomer(options);
@@ -48,6 +49,7 @@ namespace TinyCrmTests
             Assert.NotNull(testidcustomer);
 
             Assert.NotNull(testidcustomer.Data);
+            return customer.Data;
             
         }
 

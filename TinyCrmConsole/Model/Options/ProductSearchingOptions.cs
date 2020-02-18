@@ -16,5 +16,6 @@ namespace TinyCrmConsole.Model.Options
         public decimal MaxPrice { get; set; }
 
         public ProductCategory Category { get; set; }
+        
     }
 }

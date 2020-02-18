@@ -1,113 +1,128 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using TinyCrm.Core;
 using TinyCrm.Core.Data;
 using TinyCrm.Core.Model;
+using TinyCrm.Core.Services;
+using TinyCrmApi.Model;
 using TinyCrmConsole.Interfaces;
 using TinyCrmConsole.Model;
 using TinyCrmConsole.Model.Options;
 
 namespace TinyCrmConsole.Services
 {
-    public class OrderServices: IOrderService
+    public class OrderService : IOrderService
     {
-        private TinyCrmDbContext dbContext_;
+        private readonly TinyCrmDbContext context_;
+        private readonly ICustomerService customer_;
+        private readonly IProductService product_;
 
-        public OrderServices(TinyCrmDbContext context)
+        public OrderService(
+            TinyCrmDbContext context,
+            ICustomerService customers,
+            IProductService products)
         {
-            dbContext_ = context;
+            context_ = context;
+            customer_ = customers;
+            product_ = products;
         }
 
-        public ApiResult<Order> CreateOrder(CreatingOrderOptions options)
+        public ApiResult<Order> UpdateOrder(
+            UpdateOrderOptions options)
         {
-            var result = new ApiResult<Order>();
-
-            ICustomerService customerservice = new CustomerService(dbContext_);
-
-            if (options == null &&
-                                    options.CustomerId == default(int))
+            if (options == null)
             {
-                result.Error = StatusCode.BadRequest;
-                result.ErrorText = "no new options";
-                return result;
+                return ApiResult<Order>.CreateUnSuccessful(
+                    StatusCode.BadRequest,
+                    "null options");
             }
-
-            if (options.Products == null)
+            if (options.OrderId == default(Guid) 
+                  && options.State == OrderStatus.InValid)
             {
-                result.Error = StatusCode.BadRequest;
-                result.ErrorText = "no products";
-                return result;
+                return ApiResult<Order>.CreateUnSuccessful(
+                    StatusCode.BadRequest,
+                   "at least one option must be provided");
             }
-
-            var customer = customerservice.GetCustomerById(options.CustomerId);
-
-            if (customer.Data == null)
+            var oroptions = new SearchingOrderOptions()
             {
-                result.Error = StatusCode.BadRequest;
-                result.ErrorText = "no such customer";
-                return result;
-            }
+                OrderId = options.OrderId
+            };
+            var oresult = SearchOrders(oroptions).Data
+                .SingleOrDefault();
+            oresult.Status = options.State;
+            context_.SaveChanges();
+            return ApiResult<Order>.CreateSuccessful(oresult); 
+        }
 
+        public ApiResult<Order> CreateOrder(
+            CreateOrderOptions createoptions)
+        {
+            if (createoptions == null)
+            {
+                return new ApiResult<Order>(
+                    StatusCode.BadRequest,
+                   "no options were provided");
+            }
+            if (createoptions.ProductsIds == null)
+            {
+                return new ApiResult<Order>(
+                    StatusCode.BadRequest,
+                    "no products were given");
+            }
+            var customerresult = customer_
+                           .GetCustomerById(createoptions.CustomerId);
+            if (!customerresult.Success)
+            {
+                return ApiResult<Order>.Create(customerresult);
+            }
             var order = new Order();
-           
-            order.Customer = customer.Data;
-           
-            order.CustomerId = options.CustomerId;
-
-            foreach (var product in options.Products)
+            order.CustomerId = createoptions.CustomerId;
+            foreach (var id in createoptions.ProductsIds)
             {
-                order.OrderProducts.Add(new OrderProduct()
+                var prodResult = product_
+                     .GetProductById(id);
+                if (!prodResult.Success)
                 {
-                    Product = product
-                });
+                    return ApiResult<Order>.Create(
+                        prodResult);
+                }
+                order.OrderProducts.Add(
+                    new OrderProduct()
+                    {
+                        Product = prodResult.Data
+                    });
+
+                prodResult.Data.TotalNumberSold +=  1;
+                order.OrderCost += prodResult.Data.Price;
             }
 
             order.Created = DateTimeOffset.Now;
-
-            if (!string.IsNullOrWhiteSpace(options.Address))
+            if (!string.IsNullOrWhiteSpace(createoptions.Address))
             {
-                order.DeliveryAddress = options.Address;
+                order.DeliveryAddress = createoptions.Address;
             }
-            
-            if (options.OrderState != OrderStatus.InValid)
-            {
-                order.Status = options.OrderState;
-            }
-
-            result.Data = order;
-            
-            var custom = order.Customer;
-
-            custom.Orders.Add(order);
-
-            dbContext_.SaveChanges();
-
-            result.Data = order;
-
-            result.Error = StatusCode.Success;
-
-            return result;
+            order.Status = OrderStatus.Pending;
+            customerresult.Data.TotalGross = customer_.TotalGross(order.CustomerId);
+            context_.Set<Order>().Add(order);
+            context_.SaveChanges();
+            return ApiResult<Order>.CreateSuccessful(order);
         }
 
-        
-
-        public ApiResult<List<Order>> SearchOrders(SearchingOrderOptions options)
+        public ApiResult<IQueryable<Order>> SearchOrders(
+            SearchingOrderOptions options)
         {
-            var result = new ApiResult<List<Order>>();
-
-            //my options are not nullable
-            if ( options.CustomerId == default(int)  &&
-                               options.OrderId == default(Guid) &&
-                                            options.VatNumber == default(string) )
+            
+            if (options == null)
             {
-                result.Error = StatusCode.BadRequest;
-                result.ErrorText = "no options ";
-                return result;
+                return new ApiResult<IQueryable<Order>>(
+                     StatusCode.BadRequest,
+                     "null options");
             }
 
-            var orders = dbContext_.Set<Order>().AsQueryable();
+            var orders = context_.Set<Order>().AsQueryable();
 
-            if (options.CustomerId != default(int) )
+            if (options.CustomerId != null)
             {
                 orders = orders.Where(o => o.CustomerId == options.CustomerId);
             }
@@ -119,16 +134,18 @@ namespace TinyCrmConsole.Services
 
             if (!string.IsNullOrWhiteSpace(options.VatNumber))
             {
-                ICustomerService customerservice = new CustomerService(dbContext_);
-
-                var customer = customerservice.GetCustomerByVatNumber(options.VatNumber);
-
-                orders = orders.Where(o => o.Customer == customer.Data);
+                var customerresult = customer_.GetCustomerByVatNumber(options.VatNumber);
+                orders = orders.Where(o => o.Customer == customerresult.Data);
             }
 
-            result.Data = orders.ToList();
+            if (options.OrderState != 0)
+            {
+                orders = orders.Where(o => o.Status == options.OrderState);
+            }
 
-            return result;
+            return ApiResult<IQueryable<Order>>.CreateSuccessful(orders);
         }
+
     }
 }
+       
