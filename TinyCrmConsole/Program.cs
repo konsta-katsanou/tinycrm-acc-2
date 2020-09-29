@@ -1,57 +1,125 @@
 ﻿using System;
 using System.Linq;
-
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Configuration.FileExtensions;
-using Microsoft.Extensions.Configuration.Json;
-
+using Microsoft.Extensions.Options;
+using TinyCrm.Core.Data;
 using TinyCrm.Core.Model;
-using TinyCrm.Core.Model.Options;
 using TinyCrm.Core.Services;
+using TinyCrmConsole.Interfaces;
+using TinyCrmConsole.Model.Options;
+using TinyCrmConsole.Services;
 
 namespace TinyCrmConsole
 {
     class Program
     {
         static void Main(string[] args)
-        {
-            var config = new ConfigurationBuilder()
-                .AddJsonFile("appsettings.json", false, true)
-                .Build();
-            var connString = config.GetValue<string>("connectionString");
 
-            var db = new TinyCrm.Core.Data.TinyCrmDbContext(connString);
-            var c = db.Database.EnsureCreated();
+        { //inserting the data into the dataset
 
-            var cust = new Customer()
+            using (var context = new TinyCrmDbContext())
             {
-                Email = "Πνευματικός",
-            };
 
-            db.Add(cust);
-            db.SaveChanges();
 
-            var results = db.Set<Customer>()
-                .Where(cc => cc.Email.Equals(
-                    "πνευματικoς"))
-                .FirstOrDefault();
-
-            var productService = new ProductService();
-
-            productService.AddProduct(
-                new AddProductOptions()
+                var customer = new Customer()
                 {
-                    Id = "123",
-                    Price = 13.33M,
-                    ProductCategory = ProductCategory.Cameras,
-                    Name = "Camera 1"
-                });
+                    Lastname = "Katsanou",
+                    Email = "koukourikou@gmail.com",
+                    Firstname = "Paraskevi",
+                    Age = 25
 
-            productService.UpdateProduct("123",
-                new UpdateProductOptions()
+                };
+                context.Add(customer);
+                context.SaveChanges();
+
+                ICustomerService customerservice = new CustomerService(context);
+
+                var options = new SearchingCustomeroptions()
                 {
-                    Price = 22.22M
-                });
+                    Email = "koukourikou@gmail.com",
+                    FirstName = "Paraskevi"
+                };
+
+                var results = customerservice.SearchCustomers(options);
+
+
+
+                Console.WriteLine($"Found {results.Count()} customers");
+
+                var createoptions = new CreatingCustomerOptions()
+                {
+                    VatNumber = "125648934",
+                    Email = "constance@gmail.com",
+                    Age = 32,
+                    Lastname = "Papadimitriou"
+                };
+
+                var result = customerservice.CreateCustomer(createoptions);
+
+                context.Set<Customer>().Add(result);
+                context.SaveChanges();
+
+                Customer customerbyid = customerservice.GetCustomerById(1);
+
+                Console.WriteLine($"The name of the customer with id {customerbyid.Id} is {customerbyid.Firstname}");
+
+
+
+                //ProductService Implementation
+
+
+                //    IProductService productservice = new MyProductService(context);
+
+                //    var pro_options = new CreatingProduct()
+                //    {
+                //        Id = "5963",
+                //        Description = "good camera analysis",
+                //        Price = 160,
+                //        Name = "Samsung A7",
+                //        Category = ProductCategory.Laptops
+
+
+                //    };
+
+                //    var product1 = productservice.CreateProduct(pro_options);
+
+                //    context.Set<Product>().Add(product1);
+
+
+                //    context.SaveChanges();
+
+
+
+                //    var searchoptions = new ProductSearchingOptions()
+                //    {
+                //        Name = "Samsung A7"
+                //    };
+
+                //    var products = productservice.SearchProducts( searchoptions);
+
+                //    foreach (var product in products)
+                //    {
+                //        Console.WriteLine($"The products have ids {product.Id}");
+                //    }
+                //}
+
+                IProductService productservice = new MyProductService(context);
+
+                context.AddRange(new Product { Name = "pc", InStock = 5, Id = "123" }, new Product
+                { Name = "laptop", InStock = 10, Id = "116" });
+
+                var total = productservice.TotalStock();
+
+
+
+                Console.Write(total);
+
+
+                Console.ReadKey();
+            }
         }
+        
     }
 }
+
+
+

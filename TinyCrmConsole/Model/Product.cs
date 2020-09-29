@@ -31,5 +31,10 @@
         /// 
         /// </summary>
         public ProductCategory Category { get; set; }
+        /// <summary>
+        /// 
+        /// </summary>
+
+        public int InStock { get; set; }
     }
 }
